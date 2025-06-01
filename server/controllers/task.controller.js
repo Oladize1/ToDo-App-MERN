@@ -56,6 +56,22 @@ export const editTask = async (req, res) => {
     }
 }
 
+export const toggleCompleteTask = async (req, res) => {
+    try {
+        const {id} = req.params
+        console.log(id);
+        const checkExistence = await Task.findById(id)
+        if (!checkExistence) {
+            return res.status(404).json({message: `No task with id ${id}`})
+        }
+        const toggleCompletion = await Task.findByIdAndUpdate(id, {completed : !checkExistence.completed}, {new: true})
+        res.status(200).json(toggleCompletion)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: 'error completing task'})
+    }
+}
+
 export const deleteTask = async (req, res) => {
     try {
         const { id } = req.params
