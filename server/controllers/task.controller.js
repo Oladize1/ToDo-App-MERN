@@ -1,11 +1,16 @@
 import {Task} from '../models/Task.js'
 
-export const getAllTasks = (req, res) => {
-    console.log('get all tasks')
-    res.send('get all task')
+export const getAllTasks = async (req, res) => {
+    try {
+        const getalltasks = await Task.find({})
+        res.status(200).json(getalltasks)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: "Error fetching all tasks"})
+    }
 }
 
-export const createTask = (req, res) => {
+export const createTask = async (req, res) => {
     try {
         const { task } = req.body
         if (task === '') {
@@ -15,7 +20,7 @@ export const createTask = (req, res) => {
             text: task,
             completed: false
         })
-        newTask.save()
+        await newTask.save()
         res.status(201).json(newTask)
     } catch (error) {
         console.log(error)
