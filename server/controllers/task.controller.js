@@ -12,12 +12,13 @@ export const getAllTasks = async (req, res) => {
 
 export const createTask = async (req, res) => {
     try {
-        const { task } = req.body
+        const { task, dueDate } = req.body
         if (!task || task.trim() === '') {
             return res.status(400).json("Task cannot be empty")
         }
         const newTask = new Task({
-            text: task.trim()
+            text: task.trim(),
+            ...(dueDate && {dueDate})
         })
         await newTask.save()
         res.status(201).json(newTask)
