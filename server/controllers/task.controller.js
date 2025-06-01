@@ -2,8 +2,8 @@ import {Task} from '../models/Task.js'
 
 export const getAllTasks = async (req, res) => {
     try {
-        const getalltasks = await Task.find({})
-        res.status(200).json(getalltasks)
+        const tasks = await Task.find({}).sort({ createdAt: -1 })
+        res.status(200).json(tasks)
     } catch (error) {
         console.log(error)
         res.status(500).json({message: "Error fetching all tasks"})
@@ -13,11 +13,11 @@ export const getAllTasks = async (req, res) => {
 export const createTask = async (req, res) => {
     try {
         const { task } = req.body
-        if (task === '') {
+        if (!task || typeof task !== 'String' || task.trim() === '') {
             return res.status(400).json("Task cannot be empty")
         }
         const newTask = new Task({
-            text: task,
+            text: task.trim(),
             completed: false
         })
         await newTask.save()
