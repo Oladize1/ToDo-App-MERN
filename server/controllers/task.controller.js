@@ -13,6 +13,7 @@ export const getAllTasks = async (req, res) => {
 export const createTask = async (req, res) => {
     try {
         const { task, dueDate } = req.body
+        console.log(task, dueDate)
         if (!task || task.trim() === '') {
             return res.status(400).json("Task cannot be empty")
         }
