@@ -12,7 +12,7 @@ function App() {
       </header>
       <main className="m-10">
           <TaskInput/>
-          <section className="flex gap-4 flex-wrap md:flex-nowrap mt-7 items-center">
+          <section className="flex gap-4 w-full flex-wrap mt-7 items-center md:flex-nowrap">
             <LeftSide />
             <RightSide />
           </section>
