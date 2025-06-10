@@ -1,22 +1,32 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
+import Spinner from './Spinner';
 
 import { IoFilterSharp } from "react-icons/io5";
 import { BsCheck2Circle } from "react-icons/bs";
 import { FaPencilAlt } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 
-const LeftSide = () => {
+const LeftSide = ({filter,setfilter}) => {
 const [tasks, setTasks] = useState([])
+const [loading, setLoading] = useState(false)
 const [selectedTaskId, setSelectedTaskId] = useState(null)
 const [taskToBeEdited, setTaskToBeEdited] = useState({
   task: '',
   dueDate: ''
 })
+const [sortOption, setSortOption] = useState('all')
+const [searchTerm, setSearchTerm] = useState('')
+
+const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(searchTerm.toLowerCase()))
+
+
 async function getUser() {
+  setLoading(true)
   try {
     const getAllTask = await axios.get('http://localhost:8080/api/tasks')
     setTasks(getAllTask.data)
+    setLoading(false)
   } catch (error) {
     console.log(error)
   }
@@ -26,38 +36,111 @@ async function getUser() {
   },[])
 
   
-  const handletoggleComplete = async (id) => {
+  const handletoggleComplete = async (e, id) => {
+    e.preventDefault()
+    setLoading(true)
     try {
       await axios.patch(`http://localhost:8080/api/tasks/${id}/complete`)
+      setLoading(false)
       getUser()
     } catch (error) {
       console.log(error)
     }
   }
-  const handleEditTask = async(task) => {
+  const handleEditTask = async(e, task) => {
+    e.preventDefault()
+    setLoading(true)
     try {
       await axios.put(`http://localhost:8080/api/tasks/${selectedTaskId}`, task)
+      setLoading(false)
+      document.getElementById('edit_modal').close();
       getUser()
     } catch (error) {
       console.log(error)
     }  
   }
-  const handleDeleteTask = async (id) => {
+  const handleDeleteTask = async (e, id) => {
+    e.preventDefault()
+    setLoading(true)
     try {
       await axios.delete(`http://localhost:8080/api/tasks/${id}`)
+      setLoading(false)
+      document.getElementById('delete_modal').close();
       getUser()
     } catch (error) {
       console.log(error)
     }
   }
+
+  //sorting functionality
+  function sortByAll() {
+    setSortOption('all')
+    setfilter({
+      all: true,
+      completed: false,
+      unCompleted: false,
+      sortByDate: false
+    })
+
+  }
+  
+  function sortByCompleted() {
+    setSortOption('completed')
+    setfilter({
+      completed: true,
+      all: false,
+      unCompleted: false,
+      sortByDate: false
+    })
+    
+    
+  }
+   function sortByUnCompleted() {
+    setSortOption('uncompleted')
+    setfilter({
+      all: false,
+      completed: false,
+      unCompleted: true,
+      sortByDate: false
+    })
+   }
+
+   function sortByDate() {
+   setSortOption('date')
+   setfilter({
+      all: false,
+      completed: false,
+      unCompleted: false,
+      sortByDate: true
+   })
+   }
+
+   const getSortedTasks = () => {
+    let sorted = [...filteredSearch];
+    if (sortOption === 'completed') {
+      sorted = sorted.filter(task => task.completed);
+    } else if (sortOption === 'uncompleted') {
+      sorted = sorted.filter(task => task.completed !== true);
+    } else if (sortOption === 'date') {
+      sorted = sorted.sort((a, b) => {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+      });
+    }
+    return sorted;
+  };
+  
+  
   return (
     <div className='flex flex-col gap-2 w-full md:w-3/4 '>
+      {loading && <Spinner/>}
         <dialog id="delete_modal" className="modal modal-bottom sm:modal-middle">
           <div className="modal-box bg-white text-black rounded-2xl">
             <h3 className="font-bold text-lg">Delete Task</h3>
             <p className="py-4">Are you sure you want to Delete task with id {selectedTaskId}</p>
             <div className="modal-action">
-      <form method="dialog" onSubmit={() => handleDeleteTask(selectedTaskId)}>
+      <form method="dialog" onSubmit={(e) => handleDeleteTask(e, selectedTaskId)}>
       <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
         <button className="btn bg-red-600 text-white rounded-full p-6">Delete Task</button>
       </form>
@@ -68,7 +151,7 @@ async function getUser() {
           <div className="modal-box bg-white text-black rounded-2xl">
     <h3 className="font-bold text-lg">Edit Task</h3>
     <div className="modal-action">
-      <form method="dialog" className='w-full' onSubmit={() => handleEditTask(taskToBeEdited)}>
+      <form method="dialog" className='w-full' onSubmit={(e) => handleEditTask(e, taskToBeEdited)}>
         <input type="text" value={taskToBeEdited.task} onChange={(e) => setTaskToBeEdited(prev => ({
           ...prev,
           task: e.target.value
@@ -97,25 +180,43 @@ async function getUser() {
       <path d="m21 21-4.3-4.3"></path>
     </g>
                 </svg>
-            <input type="search" required placeholder="Search" className='outline-2 outline-gray-200' />
+            <input type="search" required placeholder="Search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className='outline-2 outline-gray-200' />
         </label>
         <div className="dropdown dropdown-start">
-            <div tabIndex={0} role="button" className="btn m-1 rounded-full outline-0 bg-gray-200"><IoFilterSharp/> Filter</div>
-            <ul tabIndex={0} className="dropdown-content menu bg-gray-200  rounded-box z-1 w-52 p-2 shadow-sm">
-                <li>All</li>
-                <li>Completed</li>
-                <li>unCompleted</li>
-                <li>sort by due date</li>
-            </ul>
+          <button 
+    tabIndex={0} 
+    role="button" 
+    className="btn m-1 rounded-full bg-gray-100 hover:bg-gray-200 text-sm font-medium flex items-center gap-2"
+  >
+    <IoFilterSharp className="text-lg" /> Filter
+          </button>
+          <ul 
+            tabIndex={0} 
+            className="dropdown-content menu bg-white text-black rounded-box shadow-md w-56 p-2 space-y-1 z-10"
+           >
+              <li>
+                <button onClick={() => sortByAll()}>All</button>
+              </li>
+              <li>
+                <button onClick={() => sortByCompleted()}>Completed</button>
+              </li>
+              <li>
+                <button onClick={() => sortByUnCompleted()}>Uncompleted</button>
+              </li>
+              <li>
+                <button onClick={() => sortByDate()}>Sort by Due Date</button>
+              </li>
+          </ul>
         </div>
+
         </div>
         <div className="rounded-xl p-1 bg-white shadow-xl">
             <h2 className='flex gap-2 items-center font-bold text-2xl'><BsCheck2Circle className='text-green-400'/> Tasks</h2>
             <div className="mt-4">
                 <ul className='flex flex-col gap-4'>
-                    {tasks ? tasks.map((task) => (
+                    {getSortedTasks().map((task) => (
                       <li key={task._id} className="rounded-full p-4 flex justify-between items-center bg-gray-300 cursor-pointer">
-                        <span onClick={() => handletoggleComplete(task._id)} className='flex gap-1'>
+                        <span onClick={(e) => handletoggleComplete(e, task._id)} className='flex gap-1'>
                           <span className={`${task.completed ? 'text-green-600 line-through': ''}`}>
                           {task.text}
                           </span> <span className='font-bold'>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}</span>
@@ -138,7 +239,7 @@ async function getUser() {
                           
                       </div>
                   </li>
-                    )) : <p>Task cleared...</p>}
+                    ))}
                 </ul>
             </div>
         </div>
