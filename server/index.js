@@ -22,7 +22,12 @@ app.get('/test', (req, res) => {
 
 // Express example
 app.get('/api/quote', async (req, res) => {
-    const response = await fetch('https://zenquotes.io/api/random');
+    const response = await fetch('https://zenquotes.io/api/random', {
+        headers: {
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'application/json'
+        }
+    });
     const data = await response.json();
     res.json(data);
   });
