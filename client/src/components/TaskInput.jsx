@@ -2,12 +2,12 @@ import React, {useState} from 'react'
 import axios from 'axios'
 import Spinner from './Spinner'
 
-const TaskInput = ({filter}) => {
+const TaskInput = ({filter, getTasks}) => {
   const [task, setTask] = useState('')
   const [date, setDate] = useState('')
   const [loading, setLoading] = useState(false)
   
-  console.log('filter in task input', filter);
+  
   
   const handleCreateTask = async(e) => {
     e.preventDefault()
@@ -21,6 +21,7 @@ const TaskInput = ({filter}) => {
       await axios.post('http://localhost:8080/api/tasks/create', {task, dueDate:date})
       setTask('')
       setDate('')
+      getTasks()
       setLoading(false)
     } catch (error) {
       console.log(error);
@@ -35,12 +36,21 @@ const TaskInput = ({filter}) => {
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input outline-2 w-full outline-gray-200 rounded-full" />
       <button className="btn bg-violet-800 outline-0 text-white rounded-full py-6">+ Add Task</button>
       </form>
-      <div className="flex gap-0.5 mt-2 text-sm cursor-pointer md:gap-4">
-        <p className={ filter.all ? 'bg-purple-700 text-white p-2 rounded-lg' : 'bg-gray-200 rounded-lg p-2'}>All</p>
-        <p className ={ filter.completed ? 'bg-purple-700 text-white rounded-lg p-2' : 'bg-gray-200 rounded-lg p-2'}>Completed</p>
-        <p className={ filter.unCompleted ? 'bg-purple-700 text-white rounded-lg p-2' : 'bg-gray-200 rounded-lg p-2'}>unCompleted</p>
-        <p className={ filter.sortByDate ? 'bg-purple-700 text-white rounded-lg p-2' : 'bg-gray-200 rounded-lg p-2'}>sort by due date</p>
+      <div className="flex flex-wrap gap-2 mt-2 text-sm cursor-pointer justify-start">
+        <p className={`px-4 py-2 rounded-lg whitespace-nowrap ${filter.all ? 'bg-purple-700 text-white' : 'bg-gray-200'}`}>
+    All
+        </p>
+        <p className={`px-4 py-2 rounded-lg whitespace-nowrap ${filter.completed ? 'bg-purple-700 text-white' : 'bg-gray-200'}`}   >
+         Completed
+        </p>
+        <p className={`px-4 py-2 rounded-lg whitespace-nowrap ${filter.unCompleted ? 'bg-purple-700 text-white' : 'bg-gray-200'}   `}>
+        Uncompleted
+        </p>
+        <p className={`px-4 py-2 rounded-lg whitespace-nowrap ${filter.sortByDate ? 'bg-purple-700 text-white' : 'bg-gray-200'}  `}>
+        Sort by due date
+        </p>
       </div>
+
     </div>
   )
 }

@@ -7,8 +7,7 @@ import { BsCheck2Circle } from "react-icons/bs";
 import { FaPencilAlt } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 
-const LeftSide = ({filter,setfilter}) => {
-const [tasks, setTasks] = useState([])
+const LeftSide = ({filter,setfilter, tasks, getTasks}) => {
 const [loading, setLoading] = useState(false)
 const [selectedTaskId, setSelectedTaskId] = useState(null)
 const [taskToBeEdited, setTaskToBeEdited] = useState({
@@ -21,19 +20,7 @@ const [searchTerm, setSearchTerm] = useState('')
 const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(searchTerm.toLowerCase()))
 
 
-async function getUser() {
-  setLoading(true)
-  try {
-    const getAllTask = await axios.get('http://localhost:8080/api/tasks')
-    setTasks(getAllTask.data)
-    setLoading(false)
-  } catch (error) {
-    console.log(error)
-  }
-}
-  useEffect(() => {
-    getUser()    
-  },[])
+
 
   
   const handletoggleComplete = async (e, id) => {
@@ -42,7 +29,7 @@ async function getUser() {
     try {
       await axios.patch(`http://localhost:8080/api/tasks/${id}/complete`)
       setLoading(false)
-      getUser()
+      getTasks()
     } catch (error) {
       console.log(error)
     }
@@ -54,7 +41,7 @@ async function getUser() {
       await axios.put(`http://localhost:8080/api/tasks/${selectedTaskId}`, task)
       setLoading(false)
       document.getElementById('edit_modal').close();
-      getUser()
+      getTasks()
     } catch (error) {
       console.log(error)
     }  
@@ -66,7 +53,7 @@ async function getUser() {
       await axios.delete(`http://localhost:8080/api/tasks/${id}`)
       setLoading(false)
       document.getElementById('delete_modal').close();
-      getUser()
+      getTasks()
     } catch (error) {
       console.log(error)
     }
@@ -135,18 +122,36 @@ async function getUser() {
   return (
     <div className='flex flex-col gap-2 w-full md:w-3/4 '>
       {loading && <Spinner/>}
-        <dialog id="delete_modal" className="modal modal-bottom sm:modal-middle">
-          <div className="modal-box bg-white text-black rounded-2xl">
-            <h3 className="font-bold text-lg">Delete Task</h3>
-            <p className="py-4">Are you sure you want to Delete task with id {selectedTaskId}</p>
-            <div className="modal-action">
-      <form method="dialog" onSubmit={(e) => handleDeleteTask(e, selectedTaskId)}>
-      <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-        <button className="btn bg-red-600 text-white rounded-full p-6">Delete Task</button>
+      <dialog id="delete_modal" className="modal modal-bottom sm:modal-middle">
+  <div className="modal-box bg-white text-black rounded-2xl">
+    <h3 className="font-bold text-lg">Delete Task</h3>
+    <p className="py-4">Are you sure you want to delete the task with ID: {selectedTaskId}?</p>
+
+    <div className="modal-action">
+      {/* Cancel Button - outside form to prevent submission */}
+      <button
+        className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        onClick={() => document.getElementById('delete_modal').close()}
+      >
+        ✕
+      </button>
+
+      {/* Delete Form */}
+      <form
+        method="dialog"
+        onSubmit={(e) => handleDeleteTask(e, selectedTaskId)}
+        className="w-full flex justify-end"
+      >
+        <button
+          type="submit"
+          className="btn bg-red-600 text-white rounded-full p-6 px-10"
+        >
+          Delete Task
+        </button>
       </form>
-            </div>
-          </div>
-        </dialog>
+    </div>
+  </div>
+      </dialog>
         <dialog id="edit_modal" className="modal modal-bottom sm:modal-middle">
           <div className="modal-box bg-white text-black rounded-2xl">
     <h3 className="font-bold text-lg">Edit Task</h3>
@@ -213,34 +218,56 @@ async function getUser() {
         <div className="rounded-xl p-1 bg-white shadow-xl">
             <h2 className='flex gap-2 items-center font-bold text-2xl'><BsCheck2Circle className='text-green-400'/> Tasks</h2>
             <div className="mt-4">
-                <ul className='flex flex-col gap-4'>
-                    {getSortedTasks().map((task) => (
-                      <li key={task._id} className="rounded-full p-4 flex justify-between items-center bg-gray-300 cursor-pointer">
-                        <span onClick={(e) => handletoggleComplete(e, task._id)} className='flex gap-1'>
-                          <span className={`${task.completed ? 'text-green-600 line-through': ''}`}>
-                          {task.text}
-                          </span> <span className='font-bold'>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : ''}</span>
-                        </span>
-                      <div className='flex gap-4 items-center'>
-                          <FaPencilAlt onClick={()=>{
-                            setSelectedTaskId(task._id)
-                            setTaskToBeEdited({
-                              task: task.text,
-                              dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : ''
-                            })
-                            document.getElementById('edit_modal').showModal()
-                            }}/>
-                          <AiFillDelete onClick={()=>{
-                            setSelectedTaskId(task._id)
-                            document.getElementById('delete_modal').showModal()
-                          }
-                          }/>
+            <ul className="space-y-4">
+  {getSortedTasks().map((task) => (
+    <li
+      key={task._id}
+      className="bg-white shadow-md rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-gray-200"
+    >
+      {/* Task Content */}
+      <div 
+        className="flex flex-col sm:flex-row sm:items-center sm:gap-4 flex-1 cursor-pointer"
+      >
+        <p
+         className={`text-base ${task.completed ? 'text-green-600 line-through' : 'text-gray-800'}`}
+         onClick={(e) => handletoggleComplete(e, task._id)}
+          >
+          {task.text}
+        </p>
+        {task.dueDate && (
+          <span className="text-sm font-medium text-gray-500 mt-1 sm:mt-0">
+            Due: {new Date(task.dueDate).toLocaleDateString()}
+          </span>
+        )}
+      </div>
 
-                          
-                      </div>
-                  </li>
-                    ))}
-                </ul>
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-5 text-xl text-gray-600">
+        <FaPencilAlt
+          className="hover:text-purple-700 transition cursor-pointer"
+          onClick={() => {
+            setSelectedTaskId(task._id);
+            setTaskToBeEdited({
+              task: task.text,
+              dueDate: task.dueDate
+                ? new Date(task.dueDate).toISOString().split('T')[0]
+                : '',
+            });
+            document.getElementById('edit_modal').showModal();
+          }}
+        />
+        <AiFillDelete
+          className="hover:text-red-600 transition cursor-pointer"
+          onClick={() => {
+            setSelectedTaskId(task._id);
+            document.getElementById('delete_modal').showModal();
+          }}
+        />
+      </div>
+    </li>
+  ))}
+</ul>
+
             </div>
         </div>
     </div>
