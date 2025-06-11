@@ -3,6 +3,7 @@ import axios from "axios"
 import TaskInput from "./components/TaskInput"
 import LeftSide from "./components/LeftSide"
 import RightSide from "./components/RightSide"
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
 function App() {
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState({
@@ -16,7 +17,7 @@ function App() {
   async function getTasks() {
     setLoading(true)
     try {
-      const getAllTask = await axios.get('http://localhost:8080/api/tasks')
+      const getAllTask = await axios.get(`${BASEURL}/api/tasks`)
       setTasks(getAllTask.data)
       setLoading(false)
     } catch (error) {

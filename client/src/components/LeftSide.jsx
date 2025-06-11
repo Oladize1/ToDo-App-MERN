@@ -7,6 +7,8 @@ import { BsCheck2Circle } from "react-icons/bs";
 import { FaPencilAlt } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com/'
+
 const LeftSide = ({filter,setfilter, tasks, getTasks}) => {
 const [loading, setLoading] = useState(false)
 const [selectedTaskId, setSelectedTaskId] = useState(null)
@@ -27,7 +29,7 @@ const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(sea
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.patch(`http://localhost:8080/api/tasks/${id}/complete`)
+      await axios.patch(`${BASEURL}/api/tasks/${id}/complete`)
       setLoading(false)
       getTasks()
     } catch (error) {
@@ -38,7 +40,7 @@ const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(sea
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.put(`http://localhost:8080/api/tasks/${selectedTaskId}`, task)
+      await axios.put(`${BASEURL}/api/tasks/${selectedTaskId}`, task)
       setLoading(false)
       document.getElementById('edit_modal').close();
       getTasks()
@@ -50,7 +52,7 @@ const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(sea
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.delete(`http://localhost:8080/api/tasks/${id}`)
+      await axios.delete(`${BASEURL}/api/tasks/${id}`)
       setLoading(false)
       document.getElementById('delete_modal').close();
       getTasks()

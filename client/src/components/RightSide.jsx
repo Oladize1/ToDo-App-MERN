@@ -6,6 +6,7 @@ import { MdInsertChartOutlined } from "react-icons/md";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
+const BASEURL = "https://todo-app-mern-dzti.onrender.com"
 
 const RightSide = ({tasks}) => {
   const [quotes, setQuotes] = useState(null)
@@ -14,7 +15,7 @@ const RightSide = ({tasks}) => {
   },[])
   async function getQuote() {
     try {
-      const fetchQuote = await axios.get('http://localhost:8080/api/quote')
+      const fetchQuote = await axios.get(`${BASEURL}/api/quote`)
       setQuotes(fetchQuote.data)
     } catch (error) {
       console.log(error);
