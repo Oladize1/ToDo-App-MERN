@@ -20,6 +20,14 @@ app.get('/test', (req, res) => {
     res.send('hello tested')
 })
 
+// Express example
+app.get('/api/quote', async (req, res) => {
+    const response = await fetch('https://zenquotes.io/api/random');
+    const data = await response.json();
+    res.json(data);
+  });
+  
+
 
 const startApp = () => {
     connectDB(process.env.MONGO_URI)
