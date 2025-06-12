@@ -14,7 +14,7 @@ export const loginRouter = async (req, res) => {
         if(!user){
             return res.status(404).json({message: 'Invalid credentials'})
         }
-        const decodedPassword = await bcryptjs.compareSync(password, user.password)
+        const decodedPassword = bcryptjs.compareSync(password, user.password)
         if(!decodedPassword){
             return res.staus(404).json({message: "invalid credentials"})
         }
