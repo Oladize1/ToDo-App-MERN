@@ -14,7 +14,7 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    Task:[{
+    task:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task'
     }]
