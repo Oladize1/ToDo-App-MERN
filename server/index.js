@@ -6,15 +6,17 @@ dotenv.config()
 import { connectDB } from './utils/connectDB.js'
 
 import { taskRouter } from './routes/task.route.js'
+import { userRouter } from './routes/user.route.js'
 
 const app = express()
 const PORT = process.env.PORT
 
-app.use(urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}))
 app.use(cors())
 app.use(express.json())
 
 app.use('/api/tasks', taskRouter)
+app.use('/api/auth', userRouter)
 
 app.get('/test', (req, res) => {
     res.send('hello tested')

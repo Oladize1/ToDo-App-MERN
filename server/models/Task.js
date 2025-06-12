@@ -9,7 +9,11 @@ const taskSchema = mongoose.Schema({
     dueDate: {
         type: Date,
         default: null
-    }
+    },
+    User: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 })
 
 export const Task = mongoose.model('Task', taskSchema)
