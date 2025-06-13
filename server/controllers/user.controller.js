@@ -16,7 +16,7 @@ export const loginRouter = async (req, res) => {
         }
         const decodedPassword = bcryptjs.compareSync(password, user.password)
         if(!decodedPassword){
-            return res.staus(404).json({message: "invalid credentials"})
+            return res.status(404).json({message: "invalid credentials"})
         }
         const token = generateToken(user._id)
         res.status(200).json({email: user.email, username: user.username, token})

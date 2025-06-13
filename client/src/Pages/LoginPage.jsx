@@ -1,9 +1,47 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Optional: Only if using React Router
+import React, {useState} from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+import Spinner from '../components/Spinner';
 
 const LoginPage = () => {
+const [email, setEmail] = useState('')
+const [password, setPassword] = useState('')
+const [loading, setLoading] = useState(false)
+
+const navigate = useNavigate()
+
+// const BASEURL = 'https://todo-app-mern-dzti.onrender.com/api/auth'
+const BASEURL = 'http://localhost:8080/api/auth'
+const handleLogin = async(e) =>{
+  e.preventDefault()
+  setLoading(true)
+  try {
+    if (email.trim() === '' || password === '') {
+      alert('invalid credentials')
+      return
+    }
+    const res = await axios.post(`${BASEURL}/login`, {email, password})
+    console.log(res);
+    
+    setLoading(false)
+    if (res.status === 200) {
+      localStorage.setItem('token', res.data.token)
+      localStorage.setItem('user', res.data.username)
+    }
+    setEmail('')
+    setPassword('')
+    navigate('/')
+  } catch (error) {
+    console.log(error);
+    alert(error?.response.data.message)
+    setLoading(false)
+  }
+}
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+      {loading && <Spinner/>}
       <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-8 sm:p-10">
         <h2 className="text-center text-3xl font-bold text-gray-900">
           Welcome Back
@@ -12,7 +50,7 @@ const LoginPage = () => {
           Log in to your account
         </p>
 
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -23,6 +61,8 @@ const LoginPage = () => {
               required
               placeholder="mail@site.com"
               className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -36,6 +76,8 @@ const LoginPage = () => {
               required
               placeholder="••••••••"
               className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
