@@ -2,6 +2,8 @@ import React from 'react'
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 const Navbar = () => {
+  const authorized = localStorage.getItem('token')
+  console.log(authorized)
   return (
     <nav className="flex justify-between items-center p-6 w-full bg-gradient-to-br from-blue-50 to-indigo-100">
         <motion.div

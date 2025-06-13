@@ -68,7 +68,7 @@ export const editTask = async (req, res) => {
             return res.status(400).json({message: "task field cannot be empty"})
         }
         if (checkExitence.user.toString() !== userId) {
-            return res.status(403).json({message: 'Unauthorized'})
+            return res.status(401).json({message: 'Unauthorized'})
         }
         const editedTask = {
             text: task.trim()
@@ -100,7 +100,7 @@ export const toggleCompleteTask = async (req, res) => {
             return res.status(404).json({message: `No task with id ${id}`})
         }
         if (checkExistence.user.toString() !== userId) {
-            return res.status(403).json({message: 'Unauthorized'})
+            return res.status(401).json({message: 'Unauthorized'})
         }
         const toggleCompletion = await Task.findByIdAndUpdate(id, {completed : !checkExistence.completed}, {new: true})
         res.status(200).json(toggleCompletion)
@@ -123,7 +123,7 @@ export const deleteTask = async (req, res) => {
             return res.status(404).json({message: `task with id ${id} not found`})
         }
         if (checkExitence.user.toString() !== userId) {
-            return res.status(403).json({message: 'Unauthorized'})
+            return res.status(401).json({message: 'Unauthorized'})
         }
         await Task.findByIdAndDelete(id)
         res.status(200).json({message: "task deleted successfully"})
