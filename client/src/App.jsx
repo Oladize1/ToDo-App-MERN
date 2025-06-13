@@ -5,7 +5,7 @@ import HomePage from "./Pages/HomePage"
 import LandingPage from "./Pages/LandingPage"
 import RegisterPage from "./Pages/registerPage"
 import LoginPage from "./Pages/LoginPage"
-import ProtectedRoute from "./components/protectedRoute"
+import ProtectedRoute from "./components/ProtectedRoute"
 function App() {
   return (
     <>
