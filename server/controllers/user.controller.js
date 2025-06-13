@@ -1,7 +1,8 @@
 import {User} from '../models/User.js'
 import bcryptjs from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
-import { generateToken } from '../utils/generateToken.js'
+import { generateToken, decodeToken } from '../utils/generateToken.js'
 
 
 export const loginRouter = async (req, res) => {
@@ -50,5 +51,19 @@ export const registerRouter = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({message: 'error during registration', error})
+    }
+}
+
+export const verifyToken = async (req, res) => {
+    try {
+        const token = decodeToken(req)
+        const verify = jwt.verify(token, process.env.SECRET)
+        if (!verify) {
+            return res.status(401).json({message: 'Unauthorized'})
+        }
+        res.status(200).json(token)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: 'error verifying token'})
     }
 }
