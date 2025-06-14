@@ -4,8 +4,8 @@ import TaskInput from '../components/TaskInput'
 import LeftSide from '../components/LeftSide'
 import RightSide from '../components/RightSide'
 
-const BASEURL = 'http://localhost:8080'
-// const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
+// const BASEURL = 'http://localhost:8080'
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
 
 function HomePage() {
   const [loading, setLoading] = useState(true)

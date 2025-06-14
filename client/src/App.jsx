@@ -7,7 +7,8 @@ import RegisterPage from "./Pages/registerPage"
 import LoginPage from "./Pages/LoginPage"
 import ProtectedRoute from "./components/ProtectedRoute"
 import axios from "axios"
-const BASEURL = 'http://localhost:8080/api/auth'
+// const BASEURL = 'http://localhost:8080/api/auth'
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com/api/auth'
 function App() {
   const navigate = useNavigate()
   useEffect(()=>{

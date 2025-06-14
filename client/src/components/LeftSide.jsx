@@ -6,7 +6,8 @@ import { BsCheck2Circle } from 'react-icons/bs';
 import { FaPencilAlt } from 'react-icons/fa';
 import { AiFillDelete } from 'react-icons/ai';
 
-const BASEURL = 'http://localhost:8080';
+// const BASEURL = 'http://localhost:8080';
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
 
 const LeftSide = ({ filter, setfilter, tasks, getTasks }) => {
   const [loading, setLoading] = useState(false);

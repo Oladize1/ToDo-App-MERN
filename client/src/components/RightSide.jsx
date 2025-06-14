@@ -4,7 +4,8 @@ import { MdInsertChartOutlined } from 'react-icons/md'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
 
-const BASEURL = 'http://localhost:8080'
+// const BASEURL = 'http://localhost:8080'
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
 
 const RightSide = ({ tasks }) => {
   const [quotes, setQuotes] = useState(null)

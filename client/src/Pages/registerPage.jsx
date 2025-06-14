@@ -4,7 +4,8 @@ import axios from 'axios';
 
 import Spinner from '../components/Spinner';
 
-const BASEURL = 'http://localhost:8080/api/auth/'
+// const BASEURL = 'http://localhost:8080/api/auth/'
+const BASEURL = 'https://todo-app-mern-dzti.onrender.com/api/auth'
 const RegisterPage = () => {
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
