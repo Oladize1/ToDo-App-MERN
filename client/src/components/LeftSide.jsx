@@ -1,146 +1,97 @@
-import React, {useState, useEffect} from 'react'
-import axios from 'axios'
+import React, { useState } from 'react';
+import axios from 'axios';
 import Spinner from './Spinner';
+import { IoFilterSharp } from 'react-icons/io5';
+import { BsCheck2Circle } from 'react-icons/bs';
+import { FaPencilAlt } from 'react-icons/fa';
+import { AiFillDelete } from 'react-icons/ai';
 
-import { IoFilterSharp } from "react-icons/io5";
-import { BsCheck2Circle } from "react-icons/bs";
-import { FaPencilAlt } from "react-icons/fa";
-import { AiFillDelete } from "react-icons/ai";
+const BASEURL = 'http://localhost:8080';
 
-// const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
-const BASEURL = 'http://localhost:8080'
-const LeftSide = ({filter,setfilter, tasks, getTasks}) => {
-const [loading, setLoading] = useState(false)
-const [selectedTaskId, setSelectedTaskId] = useState(null)
-const [taskToBeEdited, setTaskToBeEdited] = useState({
-  task: '',
-  dueDate: ''
-})
-const [sortOption, setSortOption] = useState('all')
-const [searchTerm, setSearchTerm] = useState('')
+const LeftSide = ({ filter, setfilter, tasks, getTasks }) => {
+  const [loading, setLoading] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [taskToBeEdited, setTaskToBeEdited] = useState({ task: '', dueDate: '' });
+  const [sortOption, setSortOption] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const token = localStorage.getItem('token');
 
-const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(searchTerm.toLowerCase()));
 
-const token = localStorage.getItem('token')
-
-if (!token) {
-  console.error('No token found!');
-  return;
-}
-
-  
   const handletoggleComplete = async (e, id) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     try {
-      await axios.patch(`${BASEURL}/api/tasks/${id}/complete`, {} ,{
-        headers: {
-          'Authorization' : `Bearer ${token}`
-        }
-      })
-      setLoading(false)
-      getTasks()
+      await axios.patch(`${BASEURL}/api/tasks/${id}/complete`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLoading(false);
+      getTasks();
     } catch (error) {
-      console.log(error)
-      setLoading(false)
+      console.log(error);
     }
-  }
-  const handleEditTask = async(e, task) => {
-    e.preventDefault()
-    setLoading(true)
+  };
+
+  const handleEditTask = async (e, task) => {
+    e.preventDefault();
+    setLoading(true);
     try {
       await axios.put(`${BASEURL}/api/tasks/${selectedTaskId}`, task, {
-        headers: {
-          'Authorization' : `Bearer ${token}`
-        }
-      })
-      setLoading(false)
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLoading(false);
       document.getElementById('edit_modal').close();
-      getTasks()
+      getTasks();
     } catch (error) {
-      console.log(error)
-    }  
-  }
+      console.log(error);
+    }
+  };
+
   const handleDeleteTask = async (e, id) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     try {
       await axios.delete(`${BASEURL}/api/tasks/${id}`, {
-        headers: {
-          'Authorization' : `Bearer ${token}`
-        }
-      })
-      setLoading(false)
-      document.getElementById('delete_modal').close();
-      getTasks()
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  //sorting functionality
-  function sortByAll() {
-    setSortOption('all')
-    setfilter({
-      all: true,
-      completed: false,
-      unCompleted: false,
-      sortByDate: false
-    })
-
-  }
-  
-  function sortByCompleted() {
-    setSortOption('completed')
-    setfilter({
-      completed: true,
-      all: false,
-      unCompleted: false,
-      sortByDate: false
-    })
-    
-    
-  }
-   function sortByUnCompleted() {
-    setSortOption('uncompleted')
-    setfilter({
-      all: false,
-      completed: false,
-      unCompleted: true,
-      sortByDate: false
-    })
-   }
-
-   function sortByDate() {
-   setSortOption('date')
-   setfilter({
-      all: false,
-      completed: false,
-      unCompleted: false,
-      sortByDate: true
-   })
-   }
-
-   const getSortedTasks = () => {
-    let sorted = [...filteredSearch];
-    if (sortOption === 'completed') {
-      sorted = sorted.filter(task => task.completed);
-    } else if (sortOption === 'uncompleted') {
-      sorted = sorted.filter(task => task.completed !== true);
-    } else if (sortOption === 'date') {
-      sorted = sorted.sort((a, b) => {
-        if (!a.dueDate) return 1;
-        if (!b.dueDate) return -1;
-        return new Date(a.dueDate) - new Date(b.dueDate);
+        headers: { Authorization: `Bearer ${token}` },
       });
+      setLoading(false);
+      document.getElementById('delete_modal').close();
+      getTasks();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const sortByAll = () => {
+    setSortOption('all');
+    setfilter({ all: true, completed: false, unCompleted: false, sortByDate: false });
+  };
+  const sortByCompleted = () => {
+    setSortOption('completed');
+    setfilter({ completed: true, all: false, unCompleted: false, sortByDate: false });
+  };
+  const sortByUnCompleted = () => {
+    setSortOption('uncompleted');
+    setfilter({ all: false, completed: false, unCompleted: true, sortByDate: false });
+  };
+  const sortByDate = () => {
+    setSortOption('date');
+    setfilter({ all: false, completed: false, unCompleted: false, sortByDate: true });
+  };
+
+  const getSortedTasks = () => {
+    let sorted = [...filteredSearch];
+    if (sortOption === 'completed') sorted = sorted.filter(task => task.completed);
+    else if (sortOption === 'uncompleted') sorted = sorted.filter(task => !task.completed);
+    else if (sortOption === 'date') {
+      sorted.sort((a, b) => new Date(a.dueDate || 0) - new Date(b.dueDate || 0));
     }
     return sorted;
   };
-  
-  
+
   return (
-    <div className='flex flex-col gap-2 w-full md:w-3/4 '>
-      {loading && <Spinner/>}
+    <div className='w-full md:w-3/4 px-4 py-6 space-y-6'>
+      {loading && <Spinner />}
       <dialog id="delete_modal" className="modal modal-bottom sm:modal-middle">
   <div className="modal-box bg-white text-black rounded-2xl">
     <h3 className="font-bold text-lg">Delete Task</h3>
@@ -190,107 +141,93 @@ if (!token) {
     </div>
           </div>
         </dialog>
-        <div className="rounded-full flex gap-1 p-4 shadow-md bg-white">
-        <label className="input utline-2 outline-gray-200 w-full">
-            <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <g
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      strokeWidth="2.5"
-      fill="none"
-      stroke="currentColor"
-    >
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.3-4.3"></path>
-    </g>
-                </svg>
-            <input type="search" required placeholder="Search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className='outline-2 outline-gray-200' />
+      <div className='flex gap-2 items-center'>
+        <label className='input input-bordered flex items-center gap-2 rounded-full w-full'>
+          <svg className='h-5 w-5 opacity-50' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M21 21l-4.35-4.35M17 17A7.5 7.5 0 1012 19.5a7.5 7.5 0 005-2.5z' />
+          </svg>
+          <input
+            type='search'
+            className='grow outline-none'
+            placeholder='Search tasks...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </label>
-        <div className="dropdown dropdown-start">
-          <button 
-    tabIndex={0} 
-    role="button" 
-    className="btn m-1 rounded-full bg-gray-100 hover:bg-gray-200 text-sm font-medium flex items-center gap-2"
-  >
-    <IoFilterSharp className="text-lg" /> Filter
+
+        <div className='dropdown dropdown-start'>
+          <button className='btn btn-sm rounded-full bg-gray-100 hover:bg-gray-200 flex items-center gap-2'>
+            <IoFilterSharp className='text-lg' /> Filter
           </button>
-          <ul 
-            tabIndex={0} 
-            className="dropdown-content menu bg-white text-black rounded-box shadow-md w-56 p-2 space-y-1 z-10"
-           >
-              <li>
-                <button onClick={() => sortByAll()}>All</button>
-              </li>
-              <li>
-                <button onClick={() => sortByCompleted()}>Completed</button>
-              </li>
-              <li>
-                <button onClick={() => sortByUnCompleted()}>Uncompleted</button>
-              </li>
-              <li>
-                <button onClick={() => sortByDate()}>Sort by Due Date</button>
-              </li>
+          <ul className='dropdown-content menu bg-white text-black rounded-box shadow-md w-56 p-2 space-y-1 z-10'>
+            <li><button onClick={sortByAll}>All</button></li>
+            <li><button onClick={sortByCompleted}>Completed</button></li>
+            <li><button onClick={sortByUnCompleted}>Uncompleted</button></li>
+            <li><button onClick={sortByDate}>Due Date</button></li>
           </ul>
         </div>
-
-        </div>
-        <div className="rounded-xl p-1 bg-white shadow-xl">
-            <h2 className='flex gap-2 items-center font-bold text-2xl'><BsCheck2Circle className='text-green-400'/> Tasks</h2>
-            <div className="mt-4">
-            <ul className="space-y-4">
-  {getSortedTasks().map((task) => (
-    <li
-      key={task._id}
-      className="bg-white shadow-md rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-gray-200"
-    >
-      {/* Task Content */}
-      <div 
-        className="flex flex-col sm:flex-row sm:items-center sm:gap-4 flex-1 cursor-pointer"
-      >
-        <p
-         className={`text-base ${task.completed ? 'text-green-600 line-through' : 'text-gray-800'}`}
-         onClick={(e) => handletoggleComplete(e, task._id)}
-          >
-          {task.text}
-        </p>
-        {task.dueDate && (
-          <span className="text-sm font-medium text-gray-500 mt-1 sm:mt-0">
-            Due: {new Date(task.dueDate).toLocaleDateString()}
-          </span>
-        )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-5 text-xl text-gray-600">
-        <FaPencilAlt
-          className="hover:text-purple-700 transition cursor-pointer"
-          onClick={() => {
-            setSelectedTaskId(task._id);
-            setTaskToBeEdited({
-              task: task.text,
-              dueDate: task.dueDate
-                ? new Date(task.dueDate).toISOString().split('T')[0]
-                : '',
-            });
-            document.getElementById('edit_modal').showModal();
-          }}
-        />
-        <AiFillDelete
-          className="hover:text-red-600 transition cursor-pointer"
-          onClick={() => {
-            setSelectedTaskId(task._id);
-            document.getElementById('delete_modal').showModal();
-          }}
-        />
-      </div>
-    </li>
-  ))}
-</ul>
+      <div className='bg-white rounded-xl shadow-lg p-4'>
+        <h2 className='text-2xl font-bold flex items-center gap-2 mb-4'>
+          <BsCheck2Circle className='text-green-500' /> Task List
+        </h2>
 
-            </div>
-        </div>
+        <ul className='space-y-4'>
+          {getSortedTasks().map(task => (
+            <li
+              key={task._id}
+              className={`p-4 rounded-2xl shadow-sm border-l-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${
+                task.completed ? 'bg-green-50 border-green-400' : 'bg-white border-gray-300'
+              }`}
+            >
+              <div className='flex flex-col sm:flex-row sm:items-center sm:gap-4 flex-1'>
+                <p
+                  className={`font-medium cursor-pointer ${
+                    task.completed ? 'line-through text-green-700' : 'text-gray-800'
+                  }`}
+                  onClick={(e) => handletoggleComplete(e, task._id)}
+                >
+                  {task.text}
+                </p>
+                {task.dueDate && (
+                  <span className='text-sm text-gray-500'>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                )}
+                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                  task.completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {task.completed ? 'Completed' : 'Pending'}
+                </span>
+              </div>
+
+              <div className='flex gap-4 text-xl text-gray-500'>
+                <FaPencilAlt
+                  title='Edit'
+                  className='hover:text-purple-600 cursor-pointer'
+                  onClick={() => {
+                    setSelectedTaskId(task._id);
+                    setTaskToBeEdited({
+                      task: task.text,
+                      dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+                    });
+                    document.getElementById('edit_modal').showModal();
+                  }}
+                />
+                <AiFillDelete
+                  title='Delete'
+                  className='hover:text-red-600 cursor-pointer'
+                  onClick={() => {
+                    setSelectedTaskId(task._id);
+                    document.getElementById('delete_modal').showModal();
+                  }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default LeftSide
+export default LeftSide;

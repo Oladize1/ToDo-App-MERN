@@ -1,54 +1,66 @@
-import { useState, useEffect } from "react"
-import axios from "axios"
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import TaskInput from '../components/TaskInput'
-import LeftSide from "../components/LeftSide"
-import RightSide from "../components/RightSide"
-// const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
+import LeftSide from '../components/LeftSide'
+import RightSide from '../components/RightSide'
+
 const BASEURL = 'http://localhost:8080'
+// const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
+
 function HomePage() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState({
-      all: true,
-      completed: false,
-      unCompleted: false,
-      sortByDate: false
+    all: true,
+    completed: false,
+    unCompleted: false,
+    sortByDate: false
   })
   const [tasks, setTasks] = useState([])
 
   const token = localStorage.getItem('token')
-  if (!token) {
-    console.error('No token found!');
-    return;
-  }
-  
-  async function getTasks() {
+
+  const getTasks = async () => {
+    if (!token) {
+      console.error('No token found!')
+      return
+    }
+
     setLoading(true)
     try {
-      const getAllTask = await axios.get(`${BASEURL}/api/tasks`, {
+      const res = await axios.get(`${BASEURL}/api/tasks`, {
         headers: {
-          'Authorization' : `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       })
-      setTasks(getAllTask.data)
+      setTasks(res.data)
+    } catch (err) {
+      console.error('Error fetching tasks:', err)
+    } finally {
       setLoading(false)
-    } catch (error) {
-      console.log(error)
     }
   }
-    useEffect(() => {
-      getTasks()    
-    },[])
+
+  useEffect(() => {
+    getTasks()
+  }, [])
 
   return (
-    <>
-      <main className="m-4">
-          <TaskInput getTasks={getTasks} filter={filter}/>
-          <section className="flex gap-4 w-full flex-wrap mt-7 md:flex-nowrap">
+    <main className="min-h-screen px-4 py-6 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        <TaskInput getTasks={getTasks} filter={filter} />
+
+        {loading ? (
+          <div className="mt-10 text-center text-gray-500">
+            <span className="text-lg font-medium animate-pulse">Loading tasks...</span>
+          </div>
+        ) : (
+          <section className="mt-8 flex flex-col md:flex-row gap-6">
             <LeftSide tasks={tasks} getTasks={getTasks} filter={filter} setfilter={setFilter} />
-            <RightSide tasks={tasks}/>
+            <RightSide tasks={tasks} />
           </section>
-      </main>
-    </>
+        )}
+      </div>
+    </main>
   )
 }
 
