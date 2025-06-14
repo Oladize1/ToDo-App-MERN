@@ -13,6 +13,7 @@ const RightSide = ({tasks}) => {
   useEffect(() => {
     getQuote()
   },[])
+  
   async function getQuote() {
     try {
       const fetchQuote = await axios.get(`${BASEURL}/api/quote`)
@@ -36,8 +37,8 @@ const RightSide = ({tasks}) => {
           <p className='font-bold text-left flex-start flex gap-1 items-center justify-center text-xl'><MdInsertChartOutlined /> Progress Overview</p>
           <div className='my-4' style={{ width: 150, height: 150 }}>
               <CircularProgressbar
-                value={progress}
-                text={`${progress}%`}
+                value={progress || 0}
+                text={`${progress || 0}%`}
                 styles={{
                   path: {
                     stroke: '#6d28d9', // progress path color (green)

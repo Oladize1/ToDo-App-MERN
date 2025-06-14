@@ -2,13 +2,18 @@ import React, {useState} from 'react'
 import axios from 'axios'
 import Spinner from './Spinner'
 
-const BASEURL = "https://todo-app-mern-dzti.onrender.com/api/tasks"
+// const BASEURL = "https://todo-app-mern-dzti.onrender.com/api/tasks"
+const BASEURL = 'http://localhost:8080/api/tasks'
 const TaskInput = ({filter, getTasks}) => {
   const [task, setTask] = useState('')
   const [date, setDate] = useState('')
   const [loading, setLoading] = useState(false)
   
-  
+  const token = localStorage.getItem('token')
+  if (!token) {
+    console.error('No token found!');
+    return;
+  }
   
   const handleCreateTask = async(e) => {
     e.preventDefault()
@@ -19,13 +24,18 @@ const TaskInput = ({filter, getTasks}) => {
         setLoading(false)
         return
       }
-      await axios.post(`${BASEURL}/create`, {task, dueDate:date})
+      await axios.post(`${BASEURL}/create`, {task, dueDate:date}, {
+        headers: {
+          'Authorization' : `Bearer ${token}`
+        }
+      })
       setTask('')
       setDate('')
       getTasks()
       setLoading(false)
     } catch (error) {
       console.log(error);
+      setLoading(false)
     }
   }
   

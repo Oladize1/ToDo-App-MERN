@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React  from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const authorized = localStorage.getItem('token')
+  const user = localStorage.getItem('user')
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -71,9 +73,10 @@ const LandingPage = () => {
           whileTap={{ scale: 0.98 }}
           className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 shadow-lg"
         >
-          <Link to={'/register'}>
+          {authorized && user ? <Link to={'/'}> Get Started - It's Free</Link> : <Link to={'/register'}>
           Get Started - It's Free
-          </Link>
+          </Link>}
+          
         </motion.button>
 
         {/* Animated background elements */}

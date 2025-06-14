@@ -7,8 +7,8 @@ import { BsCheck2Circle } from "react-icons/bs";
 import { FaPencilAlt } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 
-const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
-
+// const BASEURL = 'https://todo-app-mern-dzti.onrender.com'
+const BASEURL = 'http://localhost:8080'
 const LeftSide = ({filter,setfilter, tasks, getTasks}) => {
 const [loading, setLoading] = useState(false)
 const [selectedTaskId, setSelectedTaskId] = useState(null)
@@ -21,26 +21,39 @@ const [searchTerm, setSearchTerm] = useState('')
 
 const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(searchTerm.toLowerCase()))
 
+const token = localStorage.getItem('token')
 
-
+if (!token) {
+  console.error('No token found!');
+  return;
+}
 
   
   const handletoggleComplete = async (e, id) => {
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.patch(`${BASEURL}/api/tasks/${id}/complete`)
+      await axios.patch(`${BASEURL}/api/tasks/${id}/complete`, {} ,{
+        headers: {
+          'Authorization' : `Bearer ${token}`
+        }
+      })
       setLoading(false)
       getTasks()
     } catch (error) {
       console.log(error)
+      setLoading(false)
     }
   }
   const handleEditTask = async(e, task) => {
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.put(`${BASEURL}/api/tasks/${selectedTaskId}`, task)
+      await axios.put(`${BASEURL}/api/tasks/${selectedTaskId}`, task, {
+        headers: {
+          'Authorization' : `Bearer ${token}`
+        }
+      })
       setLoading(false)
       document.getElementById('edit_modal').close();
       getTasks()
@@ -52,7 +65,11 @@ const filteredSearch = tasks.filter(task => task.text.toLowerCase().includes(sea
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.delete(`${BASEURL}/api/tasks/${id}`)
+      await axios.delete(`${BASEURL}/api/tasks/${id}`, {
+        headers: {
+          'Authorization' : `Bearer ${token}`
+        }
+      })
       setLoading(false)
       document.getElementById('delete_modal').close();
       getTasks()

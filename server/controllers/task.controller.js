@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import { Task } from '../models/Task.js'
 import { User } from '../models/User.js'
 import { decodeToken } from '../utils/generateToken.js'
+import mongoose from 'mongoose'
 
 
 export const getAllTasks = async (req, res) => {
@@ -95,6 +96,9 @@ export const toggleCompleteTask = async (req, res) => {
             return res.status(400).json({message: 'invalid token'})
         }
         const {id} = req.params
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid task ID format' });
+          }
         const checkExistence = await Task.findById(id)
         if (!checkExistence) {
             return res.status(404).json({message: `No task with id ${id}`})
