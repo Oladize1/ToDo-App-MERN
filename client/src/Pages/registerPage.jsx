@@ -32,7 +32,7 @@ const RegisterPage = () => {
       setUsername('')
       setEmail('')
       setPassword('')
-      navigate('/')
+      navigate('/landing-page')
     } catch (error) {
       console.log(error)
       alert(error.response.data.message)
