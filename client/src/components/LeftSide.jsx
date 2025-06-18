@@ -94,7 +94,7 @@ const LeftSide = ({ filter, setfilter, tasks, getTasks }) => {
     <div className='w-full md:w-3/4 px-4 py-6 space-y-6'>
       {loading && <Spinner />}
       <dialog id="delete_modal" className="modal modal-bottom sm:modal-middle">
-  <div className="modal-box bg-white text-black rounded-2xl">
+        <div className="modal-box bg-white text-black rounded-2xl">
     <h3 className="font-bold text-lg">Delete Task</h3>
     <p className="py-4">Are you sure you want to delete the task with ID: {selectedTaskId}?</p>
 
@@ -121,9 +121,9 @@ const LeftSide = ({ filter, setfilter, tasks, getTasks }) => {
         </button>
       </form>
     </div>
-  </div>
+        </div>
       </dialog>
-        <dialog id="edit_modal" className="modal modal-bottom sm:modal-middle">
+      <dialog id="edit_modal" className="modal modal-bottom sm:modal-middle">
           <div className="modal-box bg-white text-black rounded-2xl">
     <h3 className="font-bold text-lg">Edit Task</h3>
     <div className="modal-action">
@@ -141,7 +141,7 @@ const LeftSide = ({ filter, setfilter, tasks, getTasks }) => {
       </form>
     </div>
           </div>
-        </dialog>
+      </dialog>
       <div className='flex gap-2 items-center'>
         <label className='input input-bordered flex items-center gap-2 rounded-full w-full'>
           <svg className='h-5 w-5 opacity-50' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
@@ -184,11 +184,11 @@ const LeftSide = ({ filter, setfilter, tasks, getTasks }) => {
             >
               <div className='flex flex-col sm:flex-row sm:items-center sm:gap-4 flex-1'>
                 <p
-                  className={`font-medium cursor-pointer ${
+                  className={`font-medium cursor-pointer flex gap-2 items-center ${
                     task.completed ? 'line-through text-green-700' : 'text-gray-800'
                   }`}
-                  onClick={(e) => handletoggleComplete(e, task._id)}
                 >
+                  <input checked={task.completed} className="checkbox checkbox-success" onChange={(e) => handletoggleComplete(e, task._id)} type="checkbox" name={task.text} id={task._id} />
                   {task.text}
                 </p>
                 {task.dueDate && (
